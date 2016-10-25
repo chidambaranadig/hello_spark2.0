@@ -10,11 +10,11 @@ StructField("AlarmDtTm", StringType, true),
 StructField("ArrivalDtTm", StringType, true),
 StructField("CloseDtTm", StringType, true),
 StructField("City", StringType, true),
-StructField("Zipcode", IntegerType, true),
+StructField("Zipcode", StringType, true),
 StructField("Battalion", StringType, true),
-StructField("StationArea", IntegerType, true),
-StructField("Box", IntegerType, true),
-StructField("SuppressionUnits", IntegerType, true),
+StructField("StationArea", StringType, true),
+StructField("Box", StringType, true),
+StructField("SuppressionUnits", StringType, true),
 StructField("SuppressionPersonnel", IntegerType, true),
 StructField("EMSUnits", IntegerType, true),
 StructField("EMSPersonnel", IntegerType, true),
@@ -47,10 +47,10 @@ StructField("StructureStatus", StringType, true),
 StructField("FloorofFireOrigin", StringType, true),
 StructField("FireSpread", StringType, true),
 StructField("NoFlameSpead", StringType, true),
-StructField("Numberoffloorswithminimumdamage", IntegerType, true),
-StructField("Numberoffloorswithsignificantdamage", IntegerType, true),
-StructField("Numberoffloorswithheavydamage", IntegerType, true),
-StructField("Numberoffloorswithextremedamage", IntegerType, true),
+StructField("Numberoffloorswithminimumdamage", StringType, true),
+StructField("Numberoffloorswithsignificantdamage", StringType, true),
+StructField("Numberoffloorswithheavydamage", StringType, true),
+StructField("Numberoffloorswithextremedamage", StringType, true),
 StructField("DetectorsPresent", StringType, true),
 StructField("DetectorType", StringType, true),
 StructField("DetectorOperation", StringType, true),
@@ -108,16 +108,18 @@ val sqlContext = new SQLContext(sc)
 
 
 val fireIncidents = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").schema(fireIncidentsSchema).load("/home/cnadig/Developer/Fire_Incidents.csv")
-fireIncidents.repartition(16).createOrReplaceTempView("FireIncidentsView")
+val fireIncidents2 = fireIncidents.repartition(16)
+fireIncidents2.createOrReplaceTempView("FireIncidentsView")
 
 
 val fireCalls = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").schema(fireCallsSchema).load("/home/cnadig/Developer/Fire_Department_Calls_for_Service.csv")
-fireCalls.repartition(16).createOrReplaceTempView("FireCallsView")
+val fireCalls2 = fireCalls.repartition(16)
+fireCalls2.createOrReplaceTempView("FireCallsView")
 
 val from_pattern1 = "MM/dd/yyyy"
 val from_pattern2 = "MM/dd/yyyy hh:mm:ss aa"
 
-val fireCallsDF = fireCalls.withColumn("CallDateTS", unix_timestamp(fireCalls("CallDate"), from_pattern1).cast("timestamp")).drop("CallDate")
+val fireCallsDF = fireCalls2.withColumn("CallDateTS", unix_timestamp(fireCalls("CallDate"), from_pattern1).cast("timestamp")).drop("CallDate")
 .withColumn("WatchDateTS", unix_timestamp(fireCalls("WatchDate"), from_pattern1).cast("timestamp")).drop("WatchDate")
 .withColumn("ReceivedDtTmTS", unix_timestamp(fireCalls("ReceivedDtTm"), from_pattern2).cast("timestamp")).drop("ReceivedDtTm")
 .withColumn("EntryDtTmTS", unix_timestamp(fireCalls("EntryDtTm"), from_pattern2).cast("timestamp")).drop("EntryDtTm")
@@ -129,8 +131,8 @@ val fireCallsDF = fireCalls.withColumn("CallDateTS", unix_timestamp(fireCalls("C
 .withColumn("AvailableDtTmTS", unix_timestamp(fireCalls("AvailableDtTm"), from_pattern2).cast("timestamp")).drop("AvailableDtTm")
 
 
-val fireIncidentsDF = fireIncidents.withColumn("IncidentDateTS",unix_timestamp(fireIncidents("IncidentDate"),from_pattern1).cast("timestamp")).drop("IncidentDate")
-.withColumn("AlarmDtTmTS",unix_timstamp(fireIncidents("AlarmDtTm"),from_pattern2).cast("timestamp")).drop("AlarmDtTm")
+val fireIncidentsDF = fireIncidents2.withColumn("IncidentDateTS",unix_timestamp(fireIncidents("IncidentDate"),from_pattern1).cast("timestamp")).drop("IncidentDate")
+.withColumn("AlarmDtTmTS",unix_timestamp(fireIncidents("AlarmDtTm"),from_pattern2).cast("timestamp")).drop("AlarmDtTm")
 .withColumn("ArrivalDtTmTS",unix_timestamp(fireIncidents("ArrivalDtTm"),from_pattern2).cast("timestamp")).drop("ArrivalDtTm")
 .withColumn("CloseDtTmTS",unix_timestamp(fireIncidents("CloseDtTm"),from_pattern2).cast("timestamp")).drop("CloseDtTm")
 
