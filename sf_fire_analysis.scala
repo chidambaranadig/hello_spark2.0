@@ -108,22 +108,46 @@ val sqlContext = new SQLContext(sc)
 
 
 val fireIncidents = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").schema(fireIncidentsSchema).load("/home/cnadig/Developer/Fire_Incidents.csv")
-
-val fireCalls = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").schema(fireCallsSchema).load("/home/cnadig/Developer/Fire_Department_Calls_for_Service.csv")
-
 fireIncidents.repartition(16).createOrReplaceTempView("FireIncidentsView")
 
+
+val fireCalls = sqlContext.read.format("com.databricks.spark.csv").option("header", "true").schema(fireCallsSchema).load("/home/cnadig/Developer/Fire_Department_Calls_for_Service.csv")
 fireCalls.repartition(16).createOrReplaceTempView("FireCallsView")
 
-spark.catalog.cacheTable("FireIncidentsView")
-spark.catalog.cacheTable("FireCallsView")
+val from_pattern1 = "MM/dd/yyyy"
+val from_pattern2 = "MM/dd/yyyy hh:mm:ss aa"
 
-spark.table("FireCallsView").count()
+val fireCallsDF = fireCalls.withColumn("CallDateTS", unix_timestamp(fireCalls("CallDate"), from_pattern1).cast("timestamp")).drop("CallDate")
+.withColumn("WatchDateTS", unix_timestamp(fireCalls("WatchDate"), from_pattern1).cast("timestamp")).drop("WatchDate")
+.withColumn("ReceivedDtTmTS", unix_timestamp(fireCalls("ReceivedDtTm"), from_pattern2).cast("timestamp")).drop("ReceivedDtTm")
+.withColumn("EntryDtTmTS", unix_timestamp(fireCalls("EntryDtTm"), from_pattern2).cast("timestamp")).drop("EntryDtTm")
+.withColumn("DispatchDtTmTS", unix_timestamp(fireCalls("DispatchDtTm"), from_pattern2).cast("timestamp")).drop("DispatchDtTm")
+.withColumn("ResponseDtTmTS", unix_timestamp(fireCalls("ResponseDtTm"), from_pattern2).cast("timestamp")).drop("ResponseDtTm")
+.withColumn("OnSceneDtTmTS", unix_timestamp(fireCalls("OnSceneDtTm"), from_pattern2).cast("timestamp")).drop("OnSceneDtTm")
+.withColumn("TransportDtTmTS", unix_timestamp(fireCalls("TransportDtTm"), from_pattern2).cast("timestamp")).drop("TransportDtTm")
+.withColumn("HospitalDtTmTS", unix_timestamp(fireCalls("HospitalDtTm"), from_pattern2).cast("timestamp")).drop("HospitalDtTm")
+.withColumn("AvailableDtTmTS", unix_timestamp(fireCalls("AvailableDtTm"), from_pattern2).cast("timestamp")).drop("AvailableDtTm")
 
 
+val fireIncidentsDF = fireIncidents.withColumn("IncidentDateTS",unix_timestamp(fireIncidents("IncidentDate"),from_pattern1).cast("timestamp")).drop("IncidentDate")
+.withColumn("AlarmDtTmTS",unix_timstamp(fireIncidents("AlarmDtTm"),from_pattern2).cast("timestamp")).drop("AlarmDtTm")
+.withColumn("ArrivalDtTmTS",unix_timestamp(fireIncidents("ArrivalDtTm"),from_pattern2).cast("timestamp")).drop("ArrivalDtTm")
+.withColumn("CloseDtTmTS",unix_timestamp(fireIncidents("CloseDtTm"),from_pattern2).cast("timestamp")).drop("CloseDtTm")
 
-val fireIncidentsByNeighborhood = fireIncidents.groupBy("NeighborhoodDistrict").count().orderBy(desc("count")).collect().foreach(println)
-val fireCallsByNeighborhood = fireCalls.groupBy("NeighborhoodDistrict").count.orderBy(desc("count")).collect().foreach(println)
 
+// Number of Fire Incidents Per Year
+val fireIncidentsByYear = fireIncidentsDF.select(year(fireIncidentsDF("IncidentDateTS"))).groupBy("year(IncidentDateTS)").count().orderBy("year(IncidentDateTS)")
 
-val joined = fireCalls.join(fireIncidents, fireCalls.col("IncidentNumber") === fireIncidents.col("IncidentNumber"))
+// Number of Calls Made to the Fire Department Per Year
+val fireCallsByYear = fireCallsDF.select(year(fireCallsDF("CallDateTS"))).groupBy("year(CallDateTS)").count().orderBy("year(CallDateTS)").withColumnRenamed("count","count2")
+
+val callsByYear = fireIncidentsByYear.join(fireCallsByYear, fireIncidentsByYear("year(IncidentDateTS)")===fireCallsByYear("year(CallDateTS)"),"outer").orderBy("year(CallDateTS)")
+.select("year(CallDateTS)","count","count2")
+.withColumnRenamed("count","FireIncidents")
+.withColumnRenamed("count2","FireCalls")
+.withColumnRenamed("year(CallDateTS)","Year")
+
+val fireIncidentsByNeighborhood = fireIncidentsDF.groupBy("NeighborhoodDistrict").count.orderBy(desc("count"))
+val fireCallsByNeighborhood = fireCallsDF.groupBy("NeighborhoodDistrict").count.orderBy(desc("count"))
+
+val fireCallsByType = fireCallsDF.groupBy("CallType").count().orderBy(desc("count"))
