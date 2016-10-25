@@ -1,6 +1,8 @@
 #Spark 2.0 Introduction
 
-This is a simple Spark Application that I implemented to play with Spark 2.0
+This is a simple Spark Application that I implemented to play with Spark 2.0.
+
+The Spark Commands are coded in Scala and were run on the Spark-Shell.
 
 The idea for this spark application is inspired from an _Introduction to Spark_ Jupyter Notebook found on the [Databricks Website.](www.databricks.com/try)
 
@@ -223,3 +225,104 @@ Here are some Questions that can be answered by analyzing this dataset:
 |Suspicious Package|277|
 |Train / Rail Fire|10|
 |Lightning Strike (Investigation)|6|
+
+####5. Heat Source for Fires
+|Heat Source|Count|
+|---|---|
+||385807|                                                                       
+|10 - heat from powered equipment, other|3869|
+|uu - undetermined|3662|
+|81 - heat; direct flame or convection|2673|
+|-|2511|
+|12 - radiated/conducted heat operating equ|2454|
+|00 - heat source: other|1559|
+|60 - heat; other open flame/smoking materi|1329|
+|61 - cigarette|1216|
+|11 - spark/ember/flame from operating equi|1197|
+|uu undetermined|831|
+|40 - hot or smoldering object, other|659|
+|13 - arcing|658|
+|63 - heat from undetermined smoking materi|517|
+|10 heat from powered equipment, other|382|
+|66 - candle|311|
+|43 - hot ember or ash|266|
+|64 - match|251|
+|12 radiated or conducted heat from operating equipment|224|
+|60 heat from other open flame or smoking materials, other|214|
+|13 electrical arcing|153|
+|65 - cigarette lighter|136|
+|40 hot or smoldering object, other|132|
+|00 heat source: other|125|
+|61 cigarette|118|
+|41 - heat, spark from friction|115|
+|50 - explosive, fireworks, other|114|
+|65 lighter: cigarette, cigar|108|
+|43 hot ember or ash|93|
+|54 - fireworks|82|
+|56 - incendiary device|80|
+|11 spark, ember, or flame from operating equipment|72|
+|68 - backfire from internal combustion eng|71|
+|69 - flame/torch used for lighting|66|
+|72 - chemical reaction|65|
+|undetermined undetermined|51|
+|42 - molten, hot material|46|
+|63 heat from undetermined smoking material|42|
+|heat from powered equipment, other heat from powered equipment, other|31|
+|64 match|30|
+|66 candle|30|
+|97 - multiple heat sources including multi|29|
+|70 - chemical, natural heat source, other|28|
+|81 heat from direct flame, convection currents|28|
+|69 flame/torch used for lighting|26|
+|67 - warning or road flare; fusee|22|
+|80 - heat spread from another fire, other|21|
+|71 - sunlight|21|
+|73 - lightning|19|
+|radiated or conducted heat from operating equipment radiated or conducted heat from operating equipment|18|
+|hot or smoldering object, other hot or smoldering object, other|16|
+|41 heat, spark from friction|16|
+|72 spontaneous combustion, chemical reaction|15|
+|42 molten, hot material|15|
+|84 - conducted heat from another fire|14|
+|cigarette cigarette|14|
+|54 fireworks|13|
+|62 - pipe or cigar|13|
+|74 - other static discharge|11|
+|83 - flying brand, ember, spark|11|
+|82 - radiated heat from another fire|11|
+|70 chemical, natural heat source, other|10|
+|electrical arcing electrical arcing|10|
+|spark, ember, or flame from operating equipment spark, ember, or flame from operating equipment|10|
+|heat source: other heat source: other|9|
+|heat from other open flame or smoking materials, other heat from other open flame or smoking materials, other|9|
+|heat from direct flame, convection currents heat from direct flame, convection currents|8|
+|97 multiple heat sources including multiple ignitions|7|
+|hot ember or ash hot ember or ash|6|
+|lighter: cigarette, cigar lighter: cigarette, cigar|4|
+|candle candle|3|
+|match match|3|
+|84 conducted heat from another fire|2|
+|51 - munitions|2|
+|67 warning or road flare; fuse|2|
+|68 backfire from internal combustion engine|2|
+|83 flying brand, ember, spark|2|
+|55 - model and amateur rockets|2|
+|53 - blasting agent|2|
+|heat spread from another fire, other heat spread from another fire, other|1|
+|51 munitions|1|
+|heat from undetermined smoking material heat from undetermined smoking material|1|
+|multiple heat sources including multiple ignitions multiple heat sources including multiple ignitions|1|
+|heat, spark from friction heat, spark from friction|1|
+|molten, hot material molten, hot material|1|
+|radiated heat from another fire radiated heat from another fire|1|
+|spontaneous combustion, chemical reaction spontaneous combustion, chemical reaction|1|
+|71 sunlight|1|
+
+
+###Conclusion
+* A lot of the data is incomplete which increases the inaccuracy of deductions.
+* Tenderloin is the Neighborhood where most number of calls are made.
+* Majority of the calls made are for Medical purposes.
+* Powered equipments are most frequent cause Fires.
+
+Feel free to reach out to me with suggestions, comments or feedback.
